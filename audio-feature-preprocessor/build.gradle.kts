@@ -1,6 +1,9 @@
 plugins {
     id("com.android.library") version "8.11.2"
     id("org.jetbrains.kotlin.android") version "2.0.21"
+
+    // jitpack
+    id("maven-publish")
 }
 
 android {
@@ -48,4 +51,18 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.3.0")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.7.0")
+}
+
+// Setting for jitpack distribute
+afterEvaluate {
+    publishing {
+        publications {
+            create<MavenPublication>("release") {
+                from(components["release"])
+                groupId = "com.github.gangglion"
+                artifactId = "audio-feature-preprocessor"
+                version = "0.0.1"
+            }
+        }
+    }
 }
