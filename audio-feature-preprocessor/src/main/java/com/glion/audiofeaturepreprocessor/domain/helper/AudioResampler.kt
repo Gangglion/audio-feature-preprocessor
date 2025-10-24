@@ -3,7 +3,7 @@ package com.glion.audiofeaturepreprocessor.domain.helper
 import be.tarsos.dsp.AudioEvent
 import be.tarsos.dsp.io.TarsosDSPAudioFormat
 import be.tarsos.dsp.resample.RateTransposer
-import com.glion.audiofeaturepreprocessor.data.model.DEFAULT_SAMPLE_RATE
+import com.glion.audiofeaturepreprocessor.data.DEFAULT_SAMPLE_RATE
 
 /**
  * Project : DSPSample

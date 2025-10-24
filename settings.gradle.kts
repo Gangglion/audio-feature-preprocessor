@@ -9,12 +9,6 @@ pluginManagement {
         }
         mavenCentral()
         gradlePluginPortal()
-
-        maven(
-            url = "https://mvn.0110.be/releases"
-        ) {
-            name = "TarsosDSP repository"
-        }
     }
 }
 dependencyResolutionManagement {

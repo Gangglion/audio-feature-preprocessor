@@ -5,7 +5,7 @@ import android.media.MediaCodec
 import android.media.MediaExtractor
 import android.media.MediaFormat
 import android.util.Log
-import com.glion.audiofeaturepreprocessor.data.model.AudioData
+import com.glion.audiofeaturepreprocessor.data.AudioData
 
 
 /**

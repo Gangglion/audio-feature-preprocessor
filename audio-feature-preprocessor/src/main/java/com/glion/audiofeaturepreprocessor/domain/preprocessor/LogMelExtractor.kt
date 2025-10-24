@@ -1,10 +1,10 @@
 package com.glion.audiofeaturepreprocessor.domain.preprocessor
 
 import be.tarsos.dsp.util.fft.FFT
-import com.glion.audiofeaturepreprocessor.data.model.DEFAULT_HOP_MS
-import com.glion.audiofeaturepreprocessor.data.model.DEFAULT_N_MELS
-import com.glion.audiofeaturepreprocessor.data.model.DEFAULT_SAMPLE_RATE
-import com.glion.audiofeaturepreprocessor.data.model.FFT_WINDOW_LEN
+import com.glion.audiofeaturepreprocessor.data.DEFAULT_HOP_MS
+import com.glion.audiofeaturepreprocessor.data.DEFAULT_N_MELS
+import com.glion.audiofeaturepreprocessor.data.DEFAULT_SAMPLE_RATE
+import com.glion.audiofeaturepreprocessor.data.FFT_WINDOW_LEN
 import com.glion.audiofeaturepreprocessor.domain.AudioUtils
 import kotlin.math.ln
 import kotlin.math.pow

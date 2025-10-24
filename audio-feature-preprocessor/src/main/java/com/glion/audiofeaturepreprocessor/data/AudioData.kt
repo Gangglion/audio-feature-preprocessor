@@ -1,4 +1,4 @@
-package com.glion.audiofeaturepreprocessor.data.model
+package com.glion.audiofeaturepreprocessor.data
 
 /**
  * Project : DSPSample

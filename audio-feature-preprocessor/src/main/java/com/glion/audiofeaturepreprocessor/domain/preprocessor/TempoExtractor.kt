@@ -1,9 +1,9 @@
 package com.glion.audiofeaturepreprocessor.domain.preprocessor
 
-import com.glion.audiofeaturepreprocessor.data.model.DEFAULT_HOP_MS
-import com.glion.audiofeaturepreprocessor.data.model.DEFAULT_SAMPLE_RATE
-import com.glion.audiofeaturepreprocessor.data.model.DEFAULT_TEMPO_WIN
-import com.glion.audiofeaturepreprocessor.data.model.FFT_WINDOW_LEN
+import com.glion.audiofeaturepreprocessor.data.DEFAULT_HOP_MS
+import com.glion.audiofeaturepreprocessor.data.DEFAULT_SAMPLE_RATE
+import com.glion.audiofeaturepreprocessor.data.DEFAULT_TEMPO_WIN
+import com.glion.audiofeaturepreprocessor.data.FFT_WINDOW_LEN
 
 /**
  * Project : DSPSample

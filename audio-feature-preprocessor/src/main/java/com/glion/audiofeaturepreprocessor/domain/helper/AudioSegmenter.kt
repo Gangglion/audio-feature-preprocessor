@@ -1,10 +1,10 @@
 package com.glion.audiofeaturepreprocessor.domain.helper
 
-import com.glion.audiofeaturepreprocessor.data.model.AudioData
-import com.glion.audiofeaturepreprocessor.data.model.DEFAULT_HOP_SEC
-import com.glion.audiofeaturepreprocessor.data.model.DEFAULT_MAX_SEGMENT
-import com.glion.audiofeaturepreprocessor.data.model.DEFAULT_SEGMENT_SEC
-import com.glion.audiofeaturepreprocessor.data.model.SegmentedAudio
+import com.glion.audiofeaturepreprocessor.data.AudioData
+import com.glion.audiofeaturepreprocessor.data.DEFAULT_HOP_SEC
+import com.glion.audiofeaturepreprocessor.data.DEFAULT_MAX_SEGMENT
+import com.glion.audiofeaturepreprocessor.data.DEFAULT_SEGMENT_SEC
+import com.glion.audiofeaturepreprocessor.data.SegmentedAudio
 import kotlin.math.min
 
 /**
