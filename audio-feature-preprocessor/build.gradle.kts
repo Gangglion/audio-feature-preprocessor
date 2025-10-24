@@ -36,7 +36,7 @@ android {
 }
 
 dependencies {
-    implementation("be.tarsos.dsp:core:2.5")
+    api("be.tarsos.dsp:core:2.5")
 
     implementation("androidx.core:core-ktx:1.17.0")
     implementation("androidx.appcompat:appcompat:1.7.1")

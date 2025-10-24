@@ -1,4 +1,4 @@
 This project uses TarsosDSP (https://github.com/JorenSix/TarsosDSP),
 which is licensed under the GNU General Public License v3.0.
 
-AudioFeaturePreprocessor itself is also licensed under GPL v3.0.
+audio-feature-preprocessor itself is also licensed under GPL v3.0.
