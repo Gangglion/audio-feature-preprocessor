@@ -8,6 +8,7 @@ import com.glion.audiofeaturepreprocessor.data.FFT_WINDOW_LEN
 import com.glion.audiofeaturepreprocessor.domain.AudioUtils
 import kotlin.math.ln
 import kotlin.math.pow
+import kotlin.math.roundToInt
 
 /**
  * Project : DSPSample
@@ -33,7 +34,7 @@ class LogMelExtractor(
     private val maxFreq: Float = (DEFAULT_SAMPLE_RATE / 2).toFloat(),
     hopMs: Float = DEFAULT_HOP_MS
 ) {
-    private val hopLength = (sampleRate * hopMs / 1000f).toInt()
+    private val hopLength = ((sampleRate * hopMs / 1000f).roundToInt()).coerceAtLeast(1)
 
     // mel filter bank 생성
     private val melFilterBank: Array<FloatArray> = createMelFilterBank()
@@ -50,13 +51,19 @@ class LogMelExtractor(
 
         for (frame in 0 until nFrames) {
             val start = frame * hopLength
-            for (i in buffer.indices) buffer[i] = if (start + i < signal.size) signal[start + i] else 0f
+
+            // segment 부족 시 0-padding 금지: 가능 프레임만 처리
+            if (start + fftWindowLen > signal.size) break
+
+            for (i in buffer.indices) buffer[i] = signal[start + i]
+
             AudioUtils.applyHannWindow(buffer)
             fft.forwardTransform(buffer)
             fft.modulus(buffer, spectrum)
             for (m in 0 until melBandCount) {
                 var sum = 0f
                 for (k in spectrum.indices) sum += spectrum[k] * melFilterBank[m][k]
+                // NaN / Inf 방지
                 logMel[m][frame] = 10f * ln(sum + 1e-10f) / ln(10f)
             }
         }

@@ -9,6 +9,7 @@ import com.glion.audiofeaturepreprocessor.domain.AudioUtils
 import kotlin.math.abs
 import kotlin.math.log2
 import kotlin.math.pow
+import kotlin.math.roundToInt
 
 /**
  * Project : DSPSample
@@ -31,7 +32,7 @@ class ChromaExtractor(
     private val hopMs: Float = DEFAULT_HOP_MS,
 ) {
 
-    private val hopLength = (sampleRate * hopMs / 1000f).toInt()
+    private val hopLength = ((sampleRate * hopMs / 1000f).roundToInt()).coerceAtLeast(1)
     // CQT bin frequencies (log-spaced)
     private val cqtFreqs: FloatArray = createLogFreqBins()
 
@@ -48,7 +49,10 @@ class ChromaExtractor(
 
         for (frame in 0 until nFrames) {
             val start = frame * hopLength
-            for (i in buffer.indices) buffer[i] = if (start + i < signal.size) signal[start + i] else 0f
+            // segment 부족 시 0-padding 금지
+            if (start + fftWindowLen > signal.size) break
+
+            for (i in buffer.indices) buffer[i] = signal[start + i]
 
             AudioUtils.applyHannWindow(buffer)
             fft.forwardTransform(buffer)
