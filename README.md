@@ -42,12 +42,10 @@ dependencies {
 audio-feature-preprocessor
     ├─ data
     │   ├─ AudioData
-    │   ├─ Define
-    │   └─ SegmentedAudio
+    │   └─ Define
     └─ domain
         ├─ helper
         │   ├─ AudioLoader
-        │   ├─ AudioResampler
         │   └─ AudioSegmenter
         └─ preprocessor
             ├─ ChromaExtractor
@@ -57,12 +55,10 @@ audio-feature-preprocessor
 
 ## How to Use
 ### helper
-| Function                                                                                                                                    | Description                                                                                                  | Returns                                                                        |
-|---------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------|
-| `AudioLoader().loadAudio(audioPath: String)`                                                                                                | Decodes audio.                                                                                               | `AudioData` object including `decodingData`, `sampleRate`, and `numChannels`.  |
-| `AudioResampler().resample(input: FloatArray, numChannels: Int, originRate: Float, targetRate: Float, isMono: Boolean)`                     | Resamples decoded audio data from `originRate` to `targetRate`. If `isMono` is true, converts audio to mono. | `FloatArray`                                                                   |
-| `AudioResampler().toMono(input: FloatArray, numChannels: Int)`                                                                              | Converts the input audio to a mono channel.                                                                  | `FloatArray`                                                                   |
-| `AudioSegmenter().segmenter(audioData: AudioData, segmentLengthSeconds: Float = 18.6, hopLengthSeconds: Float = 6.4, maxSegments: Int = 3)` | Splits the decoded audio into segments.                                                                      | `SegmentedAudio` object including `segments`, `sampleRate`, and `numChannels`. |
+| Function                                                                                                                                    | Description                                                                                   | Returns                                                                           |
+|---------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------|
+| `AudioLoader().loadAudio(audioPath: String, targetSampleRate: Int = 44100, isMono: Boolean = true)`                                         | Decodes the audio, resamples it to the target sample rate, and converts it to a mono channel. | An `AudioData` object containing `decodingData`, `sampleRate`, and `numChannels`. |
+| `AudioSegmenter().segmenter(audioData: AudioData, segmentLengthSeconds: Float = 18.6, hopLengthSeconds: Float = 6.4, maxSegments: Int = 3)` | Splits the decoded audio into segments.                                                       | `SegmentedAudio` object including `segments`, `sampleRate`, and `numChannels`.    |
 
 ### preprocessor
 | Function                                                                                                                                                                                      | Description                                                                                            | Returns                                                                                                  |
