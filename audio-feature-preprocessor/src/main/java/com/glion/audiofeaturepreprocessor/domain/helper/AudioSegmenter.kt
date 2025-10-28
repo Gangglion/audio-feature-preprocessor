@@ -4,7 +4,6 @@ import com.glion.audiofeaturepreprocessor.data.AudioData
 import com.glion.audiofeaturepreprocessor.data.DEFAULT_HOP_SEC
 import com.glion.audiofeaturepreprocessor.data.DEFAULT_MAX_SEGMENT
 import com.glion.audiofeaturepreprocessor.data.DEFAULT_SEGMENT_SEC
-import com.glion.audiofeaturepreprocessor.data.SegmentedAudio
 import kotlin.math.min
 
 /**
@@ -29,7 +28,7 @@ class AudioSegmenter {
         segmentLengthSeconds: Float = DEFAULT_SEGMENT_SEC,
         hopLengthSeconds: Float = DEFAULT_HOP_SEC,
         maxSegments: Int = DEFAULT_MAX_SEGMENT
-    ) : SegmentedAudio {
+    ) : List<FloatArray> {
         val segmentLengthSamples = (segmentLengthSeconds * audioData.sampleRate).toInt()
         val hopLengthSamples = (hopLengthSeconds * audioData.sampleRate).toInt()
 
@@ -41,10 +40,6 @@ class AudioSegmenter {
             start += hopLengthSamples
         }
 
-        return SegmentedAudio(
-            segments = segments,
-            sampleRate = audioData.sampleRate,
-            numChannels = audioData.numChannels
-        )
+        return segments
     }
 }

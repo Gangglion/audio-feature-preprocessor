@@ -6,6 +6,9 @@ import android.media.MediaExtractor
 import android.media.MediaFormat
 import android.util.Log
 import com.glion.audiofeaturepreprocessor.data.AudioData
+import com.glion.audiofeaturepreprocessor.data.DEFAULT_SAMPLE_RATE
+import kotlin.math.ceil
+import kotlin.math.min
 
 
 /**
@@ -22,14 +25,21 @@ class AudioLoader {
     /**
      * ByteArray로 된 오디오 파일을 디코딩 후 반환
      * @param audioPath 오디오 파일 경로
+     * @param targetSampleRate 원하는 샘플레이트. 기본값 44100
+     * @param isMono 모노 변환 여부. 기본값 true
      */
-    fun loadAudio(audioPath: String): AudioData {
+    fun loadAudio(
+        audioPath: String,
+        targetSampleRate: Int = DEFAULT_SAMPLE_RATE,
+        isMono: Boolean = true
+    ): AudioData {
         val extractor = MediaExtractor()
         extractor.setDataSource(audioPath)
 
         // 첫 번째 오디오 트랙 선택
         val trackIndex = (0 until extractor.trackCount).first {
-            extractor.getTrackFormat(it).getString(MediaFormat.KEY_MIME)?.startsWith("audio/") == true
+            extractor.getTrackFormat(it).getString(MediaFormat.KEY_MIME)
+                ?.startsWith("audio/") == true
         }
         extractor.selectTrack(trackIndex)
         val format = extractor.getTrackFormat(trackIndex)
@@ -37,30 +47,32 @@ class AudioLoader {
         val sampleRate = format.getInteger(MediaFormat.KEY_SAMPLE_RATE)
         val numChannels = format.getInteger(MediaFormat.KEY_CHANNEL_COUNT)
 
-        // PCM 인코딩 형식 확인 (16-bit 보장 여부 체크)
+        // PCM 인코딩
         val pcmEncoding = if (format.containsKey(MediaFormat.KEY_PCM_ENCODING))
             format.getInteger(MediaFormat.KEY_PCM_ENCODING)
         else AudioFormat.ENCODING_PCM_16BIT
-
-        if (pcmEncoding != AudioFormat.ENCODING_PCM_16BIT) {
-            Log.w("AudioLoader", "⚠️ Unexpected PCM encoding: $pcmEncoding (expected 16-bit PCM)")
-        }
 
         val codec = MediaCodec.createDecoderByType(mime)
         codec.configure(format, null, null, 0)
         codec.start()
 
-        val outputList = mutableListOf<Float>()
         val bufferInfo = MediaCodec.BufferInfo()
-        var isEOS = false
+        val tempOutput = mutableListOf<Float>()
 
+        var isEOS = false
         while (!isEOS) {
             val inputBufferId = codec.dequeueInputBuffer(10000)
             if (inputBufferId >= 0) {
                 val inputBuffer = codec.getInputBuffer(inputBufferId)!!
                 val sampleSize = extractor.readSampleData(inputBuffer, 0)
                 if (sampleSize < 0) {
-                    codec.queueInputBuffer(inputBufferId, 0, 0, 0L, MediaCodec.BUFFER_FLAG_END_OF_STREAM)
+                    codec.queueInputBuffer(
+                        inputBufferId,
+                        0,
+                        0,
+                        0L,
+                        MediaCodec.BUFFER_FLAG_END_OF_STREAM
+                    )
                     isEOS = true
                 } else {
                     val presentationTimeUs = extractor.sampleTime
@@ -69,7 +81,7 @@ class AudioLoader {
                 }
             }
 
-            var outputBufferId = codec.dequeueOutputBuffer(bufferInfo, 10000)
+            var outputBufferId = codec.dequeueOutputBuffer(bufferInfo, 0)
             while (outputBufferId >= 0) {
                 val outputBuffer = codec.getOutputBuffer(outputBufferId)!!
 
@@ -80,18 +92,14 @@ class AudioLoader {
                         for (i in floatBuffer.indices) {
                             floatBuffer[i] = shortBuffer.get().toFloat() / 32768f
                         }
-                        outputList.addAll(floatBuffer.toList())
+                        tempOutput.addAll(floatBuffer.toList())
                     }
 
                     AudioFormat.ENCODING_PCM_FLOAT -> {
                         val floatBuffer = outputBuffer.asFloatBuffer()
                         val floatArray = FloatArray(floatBuffer.remaining())
                         floatBuffer.get(floatArray)
-                        outputList.addAll(floatArray.toList())
-                    }
-
-                    else -> {
-                        Log.e("AudioLoader", "❌ Unsupported PCM encoding: $pcmEncoding")
+                        tempOutput.addAll(floatArray.toList())
                     }
                 }
 
@@ -104,10 +112,51 @@ class AudioLoader {
         codec.release()
         extractor.release()
 
+        // ---------------------------
+        // 모노 변환
+        val processed = if (isMono && numChannels > 1) {
+            val monoBuffer = FloatArray(tempOutput.size / numChannels)
+            for (i in monoBuffer.indices) {
+                var sum = 0f
+                for (ch in 0 until numChannels) {
+                    sum += tempOutput[i * numChannels + ch]
+                }
+                monoBuffer[i] = sum / numChannels
+            }
+            monoBuffer
+        } else {
+            tempOutput.toFloatArray()
+        }
+
+        // ---------------------------
+        // 리샘플링 (linear interpolation)
+        val finalBuffer = if (sampleRate != targetSampleRate) {
+            linearResample(processed, sampleRate, targetSampleRate)
+        } else {
+            processed
+        }
+
         return AudioData(
-            samples = outputList.toFloatArray(),
-            sampleRate = sampleRate,
-            numChannels = numChannels
+            samples = finalBuffer,
+            sampleRate = targetSampleRate,
+            numChannels = if (isMono) 1 else numChannels
         )
+    }
+
+    /**
+     * 선형 보간 리샘플링
+     */
+    private fun linearResample(input: FloatArray, srcRate: Int, targetRate: Int): FloatArray {
+        val ratio = targetRate.toDouble() / srcRate
+        val outputLength = ceil(input.size * ratio).toInt()
+        val output = FloatArray(outputLength)
+        for (i in output.indices) {
+            val srcIndex = i / ratio
+            val idx0 = srcIndex.toInt()
+            val idx1 = min(idx0 + 1, input.lastIndex)
+            val frac = (srcIndex - idx0)
+            output[i] = ((1 - frac) * input[idx0] + frac * input[idx1]).toFloat()
+        }
+        return output
     }
 }
