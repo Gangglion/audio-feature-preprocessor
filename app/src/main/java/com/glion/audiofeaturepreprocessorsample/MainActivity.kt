@@ -14,12 +14,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.lifecycleScope
 import com.glion.audiofeaturepreprocessor.data.AudioData
-import com.glion.audiofeaturepreprocessorsample.ui.theme.AudioFeaturePreprocessorSampleTheme
 import com.glion.audiofeaturepreprocessor.domain.helper.AudioLoader
 import com.glion.audiofeaturepreprocessor.domain.helper.AudioSegmenter
 import com.glion.audiofeaturepreprocessor.domain.preprocessor.ChromaExtractor
 import com.glion.audiofeaturepreprocessor.domain.preprocessor.LogMelExtractor
 import com.glion.audiofeaturepreprocessor.domain.preprocessor.TempoExtractor
+import com.glion.audiofeaturepreprocessorsample.ui.theme.AudioFeaturePreprocessorSampleTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -66,7 +66,7 @@ class MainActivity : ComponentActivity() {
                 val audioSegments = AudioSegmenter().segmenter(decodedMonoAudio)
 
                 // 3. 각 세그먼트당 전처리(병렬처리)
-                val preprocessingResult = processSegments(audioSegments)
+                processSegments(audioSegments)
             }
 
             Log.d("shhan", "################## 오디오 전처리 수행 시간 :: ${elapsed}ms ##################")
